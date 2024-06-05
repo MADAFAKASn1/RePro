@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_inicio">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.example.repro.ui.home.HomeFragment"
+        android:id="@+id/navigation_inicio"
+        android:name="com.example.repro.ui.inicio.InicioFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_inicio" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.repro.ui.dashboard.DashboardFragment"
+        android:id="@+id/navigation_canciones"
+        android:name="com.example.repro.ui.canciones.CancionesFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_canciones" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.repro.ui.notifications.NotificationsFragment"
+        android:id="@+id/navigation_videos"
+        android:name="com.example.repro.ui.videos.VideosFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_videos" />
 </navigation>

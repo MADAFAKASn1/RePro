@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="198dp"
-        android:src="@drawable/imagen_inicio_sesion" />
+        android:src="@drawable/re_proimg" />
 
     <TextView
         android:paddingLeft="5dp"
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="5dp"
-        android:text="@string/registrate_para_aprender_nuevos_idiomas"
+        android:text="@string/registrate_para_escuchar_musica_videos"
         android:textStyle="italic"
         android:textColor="@color/gray"/>
     <TextView

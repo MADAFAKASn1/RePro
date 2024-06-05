@@ -2,7 +2,7 @@ package com.example.repro.ui.repositorio;
 
 import android.util.Log;
 
-import com.example.repro.ui.modelo.UsuarioFireBase;
+import com.example.repro.ui.modelo.Usuario;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,7 +17,7 @@ public class FirebaseImple {
     // Método para registrar un nuevo usuario
     public void registrarNuevoUsuario(String email) {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        UsuarioFireBase nuevoObjeto = new UsuarioFireBase(email);
+        Usuario nuevoObjeto = new Usuario(email);
         mDatabase.child("usuarios").push().setValue(nuevoObjeto, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {

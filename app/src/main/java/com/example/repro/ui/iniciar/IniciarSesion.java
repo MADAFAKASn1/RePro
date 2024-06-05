@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.repro.MainActivity;
 import com.example.repro.databinding.ActivityIniciarSesionBinding;
-import com.example.repro.ui.home.HomeFragment;
 import com.example.repro.ui.modelo.Usuario;
 import com.example.repro.ui.registrar.Registro;
 import com.example.repro.ui.repositorio.FirebaseImple;
@@ -35,8 +34,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONException;
 
 
 public class IniciarSesion extends AppCompatActivity {
