@@ -1,6 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/imageViewFondo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/icons8_nota_musical_50"/>
+
+    <TextView
+        android:id="@+id/textViewName"
+        android:layout_width="103dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/anterior"
+        android:layout_toEndOf="@id/imageViewFondo"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="Nombre"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <ImageButton
+        android:id="@+id/play_pause"
+        android:layout_width="48dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="15dp"
+        android:layout_toStartOf="@+id/siguiente"
+        android:background="@color/white"
+        app:srcCompat="@drawable/icons8_play_30" />
+
+    <ImageButton
+        android:id="@+id/siguiente"
+        android:layout_width="48dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="53dp"
+        android:background="@color/white"
+        app:srcCompat="@drawable/icons8_doble_derecha_30" />
+
+    <ImageButton
+        android:id="@+id/anterior"
+        android:layout_width="48dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="173dp"
+        android:background="@color/white"
+        app:srcCompat="@drawable/icons8_flecha_izquierda_30" />
+
 
 </RelativeLayout>
