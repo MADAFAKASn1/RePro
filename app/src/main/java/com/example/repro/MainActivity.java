@@ -1,7 +1,6 @@
 package com.example.repro;
 
 import android.content.DialogInterface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import com.example.repro.utils.InternetUtil;
@@ -18,14 +17,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.repro.databinding.ActivityMainBinding;
 
-import com.google.firebase.database.DatabaseReference;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private MediaPlayer mediaPlayer;
-    private DatabaseReference databaseReference;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        //mediaPlayer = MediaPlayer.create(this, R.raw.song1);
         ActionBar actionBar = getSupportActionBar();
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         if (actionBar != null) {
@@ -50,41 +44,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-
-        /*String songPath = getFirstSongPath();
-        if (songPath != null) {
-            mediaPlayer = new MediaPlayer();
-            try {
-                mediaPlayer.setDataSource(songPath);
-                mediaPlayer.prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("songs");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    String songUrl = postSnapshot.getValue(String.class);
-                    if (songUrl != null) {
-                        mediaPlayer = new MediaPlayer();
-                        try {
-                            mediaPlayer.setDataSource(songUrl);
-                            mediaPlayer.prepare();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                throw databaseError.toException();
-            }
-        });*/
 
     }
     @Override
@@ -117,43 +76,4 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    /*private String getFirstSongPath() {
-        ContentResolver contentResolver = getContentResolver();
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = contentResolver.query(uri, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int dataIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-            return cursor.getString(dataIndex);
-        }
-        return null;
-    }
-
-    // Call this method when you want to start playback
-    private void startPlayback() {
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
-        }
-    }
-
-    // Call this method when you want to pause playback
-    private void pausePlayback() {
-        if (mediaPlayer != null) {
-            mediaPlayer.pause();
-        }
-    }
-
-    // Call this method when you want to stop playback
-    private void stopPlayback() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopPlayback();
-    }*/
 }

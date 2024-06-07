@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.repro.R;
 import com.example.repro.databinding.FragmentInicioBinding;
-import com.example.repro.ui.adaptadores.AdaptadorPersonalizado;
+import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoCanciones;
+import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoVideos;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +36,8 @@ public class InicioFragment extends Fragment {
     private Spinner spinner;
     private StorageReference mStorageRef;
     private FirebaseAuth firebaseAuth;
+    private AdaptadorPersonalizadoCanciones adaptadorCanciones;
+    private AdaptadorPersonalizadoVideos adaptadorVideos;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class InicioFragment extends Fragment {
                         loadCanciones();
                         break;
                     case 1: // Videos
+                        adaptadorCanciones.releaseMediaPlayer();
                         loadVideos();
                         break;
                 }
@@ -78,22 +82,18 @@ public class InicioFragment extends Fragment {
 
     private void loadCanciones() {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        System.out.println("currentUser " + currentUser);
         if (currentUser != null) {
             StorageReference cancionesRef = mStorageRef.child("canciones");
-            System.out.println("cancionesRef " + cancionesRef);
             cancionesRef.listAll()
                     .addOnSuccessListener(new OnSuccessListener<ListResult>() {
                         @Override
                         public void onSuccess(ListResult listResult) {
-                            System.out.println("cancionesRef.listAll() " + cancionesRef.listAll());
                             List<StorageReference> data = new ArrayList<>();
                             for (StorageReference fileRef : listResult.getItems()) {
-                                System.out.println("fileRef " + fileRef);
                                 data.add(fileRef);
                             }
-                            AdaptadorPersonalizado adapter = new AdaptadorPersonalizado(data, getContext());
-                            recyclerView.setAdapter(adapter);
+                            adaptadorCanciones = new AdaptadorPersonalizadoCanciones(data, getContext());
+                            recyclerView.setAdapter(adaptadorCanciones);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -119,8 +119,8 @@ public class InicioFragment extends Fragment {
                             for (StorageReference fileRef : listResult.getItems()) {
                                 data.add(fileRef);
                             }
-                            AdaptadorPersonalizado adapter = new AdaptadorPersonalizado(data, getContext());
-                            recyclerView.setAdapter(adapter);
+                            adaptadorVideos = new AdaptadorPersonalizadoVideos(data, getContext());
+                            recyclerView.setAdapter(adaptadorVideos);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -138,6 +138,9 @@ public class InicioFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (adaptadorCanciones != null) {
+            adaptadorCanciones.releaseMediaPlayer();
+        }
         binding = null;
     }
 }

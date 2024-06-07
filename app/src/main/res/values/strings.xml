@@ -12,7 +12,13 @@
     <string name="no_tienes_cuenta_crea_una_aqui">¿No tienes cuenta? Crea una aquí</string>
     <string name="o_inicia_sesion_con_google">o inicia sesion con Google</string>
     <string name="iniciar_sesi">Iniciar sesión</string>
-    <string name="eleger_cancion_video">Canciones</string>
+    <string name="elegir_cancion_video">Canciones</string>
+    <string name="nombre_cancion">Nombre Cancion</string>
+    <string name="play_pause">Play/Pause</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="anterior">Anterior</string>
+    <string name="nombre_video">Nombre Video</string>
+    <string name="imagen_de_la_canci_n">Imagen de la canción</string>
     <string-array name="spinner_options">
         <item>Canciones</item>
         <item>Videos</item>

@@ -7,6 +7,7 @@
 
     <ImageView
         android:id="@+id/imageViewFondo"
+        android:contentDescription="@string/imagen_de_la_canci_n"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
@@ -26,14 +27,15 @@
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
         android:singleLine="true"
-        android:text="Nombre"
+        android:text="@string/nombre_cancion"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
     <ImageButton
         android:id="@+id/play_pause"
-        android:layout_width="48dp"
-        android:layout_height="40dp"
+        android:contentDescription="@string/play_pause"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_marginEnd="15dp"
         android:layout_toStartOf="@+id/siguiente"
         android:background="@color/white"
@@ -41,17 +43,19 @@
 
     <ImageButton
         android:id="@+id/siguiente"
-        android:layout_width="48dp"
-        android:layout_height="40dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="53dp"
+        android:layout_marginEnd="32dp"
         android:background="@color/white"
+        android:contentDescription="@string/siguiente"
         app:srcCompat="@drawable/icons8_doble_derecha_30" />
 
     <ImageButton
         android:id="@+id/anterior"
-        android:layout_width="48dp"
-        android:layout_height="40dp"
+        android:contentDescription="@string/anterior"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="173dp"
         android:background="@color/white"

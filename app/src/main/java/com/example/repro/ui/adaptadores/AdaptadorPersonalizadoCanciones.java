@@ -18,7 +18,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.List;
 
-public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPersonalizado.MyViewHolder> {
+public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<AdaptadorPersonalizadoCanciones.MyViewHolder> {
     private List<StorageReference> mData;
     private MediaPlayer mediaPlayer;
     private int currentPlayingPosition = -1;
@@ -26,7 +26,7 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
     private Context context;
     private LayoutInflater inflater;
 
-    public AdaptadorPersonalizado(List<StorageReference> data, Context ctx) {
+    public AdaptadorPersonalizadoCanciones(List<StorageReference> data, Context ctx) {
         super();
         this.mData = data;
         this.context = ctx;
@@ -37,7 +37,7 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.adaptador_personalizado_inicio, parent, false);
+        View view = inflater.inflate(R.layout.adaptador_personalizado_canciones, parent, false);
         return new MyViewHolder(view);
     }
 
@@ -76,7 +76,7 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
             mediaPlayer.stop();
             if (currentPlayingHolder != null) {
                 currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                currentPlayingHolder.textViewName.setSelected(false); // Stop marquee effect on previous song's TextView
+                currentPlayingHolder.textViewName.setSelected(false); // Parar efecto marquee en la TextView de la canción actual
             }
         }
         mediaPlayer.reset();
@@ -90,7 +90,7 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
                 mediaPlayer.prepare();
                 mediaPlayer.start();
                 holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
-                holder.textViewName.setSelected(true); // Start marquee effect on current song's TextView
+                holder.textViewName.setSelected(true); // Start efecto marquee en la TextView de la canción actual
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -100,6 +100,21 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
             holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
             currentPlayingPosition = -1;
             currentPlayingHolder = null;
+            holder.textViewName.setSelected(false);
+        });
+
+        holder.anterior.setOnClickListener(v -> {
+            // Retroceder 30 segundos
+            int currentPosition = mediaPlayer.getCurrentPosition();
+            int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
+            mediaPlayer.seekTo(Math.max(rewindPosition, 0));
+        });
+
+        holder.siguiente.setOnClickListener(v -> {
+            // Adelantar 30 segundos
+            int currentPosition = mediaPlayer.getCurrentPosition();
+            int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
+            mediaPlayer.seekTo(Math.min(fastForwardPosition, mediaPlayer.getDuration()));
         });
     }
 
@@ -117,16 +132,31 @@ public class AdaptadorPersonalizado extends RecyclerView.Adapter<AdaptadorPerson
         }
     }
 
+    public void releaseMediaPlayer() {
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+            }
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textViewName;
         ImageView imageView;
         ImageButton playPauseButton;
+        ImageButton anterior;
+        ImageButton siguiente;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textViewName);
             imageView = itemView.findViewById(R.id.imageViewFondo);
             playPauseButton = itemView.findViewById(R.id.play_pause);
+            anterior = itemView.findViewById(R.id.anterior);
+            siguiente = itemView.findViewById(R.id.siguiente);
         }
     }
 }
