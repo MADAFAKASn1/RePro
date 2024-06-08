@@ -21,7 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.repro.databinding.FragmentCancionesBinding;
+import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoCanciones;
+import com.example.repro.ui.adaptadores.CancionesAdapter;
 import com.example.repro.ui.modelo.Cancion;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +35,20 @@ public class CancionesFragment extends Fragment {
     private static final int PERMISSION_REQUEST_CODE = 100;
     private RecyclerView recyclerView;
     private List<Cancion> cancionList;
+    private CancionesAdapter adaptadorCanciones; // Agrega el adaptador
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCancionesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        recyclerView = binding.recyclerViewCanciones; // Assuming there's a RecyclerView in your layout
+        recyclerView = binding.recyclerViewCanciones;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         cancionList = new ArrayList<>();
+
+        // Crear una instancia del adaptador y establecerlo en el RecyclerView
+        adaptadorCanciones = new CancionesAdapter(cancionList, getContext());
+        recyclerView.setAdapter(adaptadorCanciones);
 
         // Verificar y solicitar permisos si es necesario
         checkAndRequestPermissions();
@@ -89,11 +97,10 @@ public class CancionesFragment extends Fragment {
             } while (songCursor.moveToNext());
 
             songCursor.close();
-        }
 
-        /*// Configura el adaptador con la lista de canciones
-        adaptador = new AdaptadorPersonalizadoCancionesFragment(cancionList, getContext());
-        recyclerView.setAdapter(adaptador);*/
+            // Notificar al adaptador que los datos han cambiado
+            adaptadorCanciones.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -113,9 +120,9 @@ public class CancionesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        /*if (adaptador != null) {
-            adaptador.releaseMediaPlayer();
-        }*/
+        if (adaptadorCanciones != null) {
+            adaptadorCanciones.releaseMediaPlayer();
+        }
         binding = null;
     }
 }

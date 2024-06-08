@@ -55,14 +55,14 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
                     }
                 });
 
-                holder.anterior.setOnClickListener(v -> {
+                holder.resta30seg.setOnClickListener(v -> {
                     // Retroceder 30 segundos
                     int currentPosition = holder.videoView.getCurrentPosition();
                     int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
                     holder.videoView.seekTo(Math.max(rewindPosition, 0));
                 });
 
-                holder.siguiente.setOnClickListener(v -> {
+                holder.suma30Seg.setOnClickListener(v -> {
                     // Adelantar 30 segundos
                     int currentPosition = holder.videoView.getCurrentPosition();
                     int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
@@ -81,16 +81,16 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
         TextView textViewName;
         VideoView videoView;
         ImageButton playPauseButton;
-        ImageButton anterior;
-        ImageButton siguiente;
+        ImageButton resta30seg;
+        ImageButton suma30Seg;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textViewName);
             videoView = itemView.findViewById(R.id.videoView);
             playPauseButton = itemView.findViewById(R.id.play_pause);
-            anterior = itemView.findViewById(R.id.anterior);
-            siguiente = itemView.findViewById(R.id.siguiente);
+            resta30seg = itemView.findViewById(R.id.rest30seg);
+            suma30Seg = itemView.findViewById(R.id.sum30seg);
         }
     }
 }

@@ -18,7 +18,7 @@
         android:layout_width="103dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
-        android:layout_toStartOf="@+id/anterior"
+        android:layout_toStartOf="@+id/rest30seg"
         android:layout_toEndOf="@id/imageViewFondo"
         android:ellipsize="marquee"
         android:focusable="true"
@@ -36,12 +36,12 @@
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:layout_marginEnd="15dp"
-        android:layout_toStartOf="@+id/siguiente"
+        android:layout_toStartOf="@+id/sum30seg"
         android:background="@color/white"
         app:srcCompat="@drawable/icons8_play_30" />
 
     <ImageButton
-        android:id="@+id/siguiente"
+        android:id="@+id/sum30seg"
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:layout_alignParentEnd="true"
@@ -51,7 +51,7 @@
         app:srcCompat="@drawable/icons8_doble_derecha_30" />
 
     <ImageButton
-        android:id="@+id/anterior"
+        android:id="@+id/rest30seg"
         android:contentDescription="@string/anterior"
         android:layout_width="55dp"
         android:layout_height="55dp"
