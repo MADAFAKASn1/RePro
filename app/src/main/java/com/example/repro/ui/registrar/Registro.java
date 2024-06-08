@@ -21,7 +21,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.json.JSONException;
 
 public class Registro extends AppCompatActivity {
     private ActivityRegistroBinding binding;
@@ -42,8 +41,6 @@ public class Registro extends AppCompatActivity {
                 if (!binding.email.getText().toString().isEmpty() && binding.password.getText().toString().equalsIgnoreCase(binding.passwordRepet.getText().toString())) {
                     String pass = binding.password.getText().toString().trim();
                     String ema = binding.email.getText().toString().trim();
-                    System.out.println(pass);
-                    System.out.println(ema);
                     firebaseAuth.createUserWithEmailAndPassword(ema, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {

@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -31,9 +32,6 @@ public class CancionesFragment extends Fragment {
     private static final int PERMISSION_REQUEST_CODE = 100;
     private RecyclerView recyclerView;
     private List<Cancion> cancionList;
-/*
-    private AdaptadorPersonalizadoCancionesFragment adaptador;
-*/
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -45,13 +43,26 @@ public class CancionesFragment extends Fragment {
         cancionList = new ArrayList<>();
 
         // Verificar y solicitar permisos si es necesario
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQUEST_CODE);
-        } else {
-            loadSongs();
-        }
+        checkAndRequestPermissions();
 
         return root;
+    }
+
+    private void checkAndRequestPermissions() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // Si el permiso fue denegado previamente y el usuario marcó "No volver a preguntar"
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_MEDIA_AUDIO)) {
+                // Mostrar una explicación al usuario
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQUEST_CODE);
+                Toast.makeText(getContext(), "El permiso es necesario para cargar las canciones.", Toast.LENGTH_LONG).show();
+            }
+
+            // Solicitar el permiso
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQUEST_CODE);
+        } else {
+            // Permiso ya concedido
+            loadSongs();
+        }
     }
 
     private void loadSongs() {
@@ -59,19 +70,22 @@ public class CancionesFragment extends Fragment {
         Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {
                 MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA
         };
         Cursor songCursor = contentResolver.query(songUri, projection, null, null, null);
 
         if (songCursor != null && songCursor.moveToFirst()) {
             int idColumn = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int titleColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int uriColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
 
             do {
                 long id = songCursor.getLong(idColumn);
                 String title = songCursor.getString(titleColumn);
+                String uri = songCursor.getString(uriColumn);
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-                cancionList.add(new Cancion(title, contentUri.toString()));
+                cancionList.add(new Cancion(title, uri)); // Crear un objeto Cancion y agregarlo a la lista
             } while (songCursor.moveToNext());
 
             songCursor.close();
@@ -90,8 +104,8 @@ public class CancionesFragment extends Fragment {
                 // Permiso concedido, puedes proceder con la carga de canciones
                 loadSongs();
             } else {
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQUEST_CODE);
-                // Permiso denegado, manejar el caso adecuadamente
+                // Permiso denegado, solicitar de nuevo el permiso
+                checkAndRequestPermissions();
             }
         }
     }

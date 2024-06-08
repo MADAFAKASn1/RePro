@@ -19,6 +19,7 @@
     <string name="anterior">Anterior</string>
     <string name="nombre_video">Nombre Video</string>
     <string name="imagen_de_la_canci_n">Imagen de la canción</string>
+    <string name="default_notification_channel_id">Music Service Channel</string>
     <string-array name="spinner_options">
         <item>Canciones</item>
         <item>Videos</item>

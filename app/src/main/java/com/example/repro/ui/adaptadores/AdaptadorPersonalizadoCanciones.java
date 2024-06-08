@@ -4,7 +4,6 @@ import static com.example.repro.ui.servicios.MusicService.mediaPlayer;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,6 @@ import com.example.repro.R;
 import com.example.repro.ui.servicios.MusicService;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
 import java.util.List;
 
 public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<AdaptadorPersonalizadoCanciones.MyViewHolder> {
@@ -77,7 +75,7 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         holder.anterior.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
-                int rewindPosition = currentPosition - 30000; // 30 seconds in milliseconds
+                int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
                 mediaPlayer.seekTo(Math.max(rewindPosition, 0));
             }
         });
@@ -85,7 +83,7 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         holder.siguiente.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
-                int fastForwardPosition = currentPosition + 30000; // 30 seconds in milliseconds
+                int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
                 mediaPlayer.seekTo(Math.min(fastForwardPosition, mediaPlayer.getDuration()));
             }
         });

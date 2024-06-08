@@ -40,6 +40,7 @@ public class FirebaseImple {
                 for (DataSnapshot usuarioSnapshot : dataSnapshot.getChildren()) {
                     String emailUsuario = usuarioSnapshot.child("email").getValue(String.class);
                     // Aquí puedes hacer lo que necesites con la información del usuario
+                    System.out.println("Email del usuario: " + emailUsuario);
                 }
             }
 

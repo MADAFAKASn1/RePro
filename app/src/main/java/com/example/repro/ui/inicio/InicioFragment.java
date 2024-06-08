@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -69,7 +68,7 @@ public class InicioFragment extends Fragment {
         spinner = binding.spinner;
 
         //Spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.spinner_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -125,9 +124,10 @@ public class InicioFragment extends Fragment {
                         }
                     });
         } else {
-            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            System.out.println("Usuario no autenticado");
         }
     }
+
 
     private void loadVideos() {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
@@ -152,9 +152,10 @@ public class InicioFragment extends Fragment {
                         }
                     });
         } else {
-            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            System.out.println("Usuario no autenticado");
         }
     }
+
 
     @Override
     public void onDestroyView() {

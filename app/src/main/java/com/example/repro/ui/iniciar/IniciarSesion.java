@@ -65,6 +65,10 @@ public class IniciarSesion extends AppCompatActivity {
             public void onClick(View view) {
                 String email = binding.email.getText().toString().trim();
                 String password = binding.password.getText().toString().trim();
+                if (email.isEmpty() || password.isEmpty()) {
+                    // Si el correo electrónico o la contraseña están vacíos, muestra un mensaje de error
+                    Toast.makeText(IniciarSesion.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
+                } else {
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -82,7 +86,6 @@ public class IniciarSesion extends AppCompatActivity {
                                             } catch (InterruptedException e) {
                                                 e.printStackTrace();
                                             }
-                                            System.out.println("Usuario que se quiere logear: " + inicioSesionUsuario);
                                             // Luego de esperar 2 segundos, ejecuta el código
                                             Intent intent = new Intent(IniciarSesion.this, MainActivity.class);
                                             startActivity(intent);
@@ -97,6 +100,7 @@ public class IniciarSesion extends AppCompatActivity {
                                 }
                             }
                         });
+                }
             }
         });
         binding.signInButton.setOnClickListener(new View.OnClickListener() {
