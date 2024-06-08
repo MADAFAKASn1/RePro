@@ -1,7 +1,11 @@
 package com.example.repro.ui.adaptadores;
 
+import static com.example.repro.ui.servicios.MusicService.mediaPlayer;
+
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.repro.R;
+import com.example.repro.ui.servicios.MusicService;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
@@ -20,17 +25,15 @@ import java.util.List;
 
 public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<AdaptadorPersonalizadoCanciones.MyViewHolder> {
     private List<StorageReference> mData;
-    private MediaPlayer mediaPlayer;
-    private int currentPlayingPosition = -1;
-    private MyViewHolder currentPlayingHolder = null;
     private Context context;
     private LayoutInflater inflater;
+    private int currentPlayingPosition = -1;
+    private MyViewHolder currentPlayingHolder = null;
 
     public AdaptadorPersonalizadoCanciones(List<StorageReference> data, Context ctx) {
         super();
         this.mData = data;
         this.context = ctx;
-        this.mediaPlayer = new MediaPlayer();
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -45,23 +48,45 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         StorageReference item = mData.get(position);
         holder.textViewName.setText(item.getName());
-
-        holder.playPauseButton.setImageResource(
-                holder.getAdapterPosition() == currentPlayingPosition ?
-                        R.drawable.icons8_pausa_30 : R.drawable.icons8_play_30
-        );
-
+        if (position == currentPlayingPosition) {
+            holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+        } else {
+            holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+        }
         holder.playPauseButton.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition()) {
+                Intent intent;
                 if (mediaPlayer.isPlaying()) {
-                    pauseAudio();
-                    currentPlayingHolder.textViewName.setSelected(false);
+                    intent = new Intent(context, MusicService.class);
+                    intent.setAction(MusicService.ACTION_PAUSE);
+                    context.startService(intent);
+                    holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+                    holder.textViewName.setSelected(false);
                 } else {
-                    resumeAudio();
-                    currentPlayingHolder.textViewName.setSelected(true);
+                    intent = new Intent(context, MusicService.class);
+                    intent.setAction(MusicService.ACTION_RESUME);
+                    context.startService(intent);
+                    holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+                    holder.textViewName.setSelected(true);
                 }
             } else {
                 playAudio(holder, item);
+            }
+        });
+
+        holder.anterior.setOnClickListener(v -> {
+            if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
+                int currentPosition = mediaPlayer.getCurrentPosition();
+                int rewindPosition = currentPosition - 30000; // 30 seconds in milliseconds
+                mediaPlayer.seekTo(Math.max(rewindPosition, 0));
+            }
+        });
+
+        holder.siguiente.setOnClickListener(v -> {
+            if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
+                int currentPosition = mediaPlayer.getCurrentPosition();
+                int fastForwardPosition = currentPosition + 30000; // 30 seconds in milliseconds
+                mediaPlayer.seekTo(Math.min(fastForwardPosition, mediaPlayer.getDuration()));
             }
         });
     }
@@ -72,74 +97,40 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
     }
 
     private void playAudio(MyViewHolder holder, StorageReference item) {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            if (currentPlayingHolder != null) {
-                currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                currentPlayingHolder.textViewName.setSelected(false); // Parar efecto marquee en la TextView de la canción actual
-            }
+        if (currentPlayingHolder != null) {
+            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            currentPlayingHolder.textViewName.setSelected(false);
         }
-        mediaPlayer.reset();
 
         currentPlayingPosition = holder.getAdapterPosition();
         currentPlayingHolder = holder;
 
         item.getDownloadUrl().addOnSuccessListener(uri -> {
-            try {
-                mediaPlayer.setDataSource(uri.toString());
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-                holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
-                holder.textViewName.setSelected(true); // Start efecto marquee en la TextView de la canción actual
-            } catch (IOException e) {
-                e.printStackTrace();
+            Intent serviceIntent = new Intent(context, MusicService.class);
+            serviceIntent.setAction(MusicService.ACTION_PLAY);
+            serviceIntent.putExtra("songUrl", uri.toString());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
             }
-        });
 
-        mediaPlayer.setOnCompletionListener(mp -> {
-            holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-            currentPlayingPosition = -1;
-            currentPlayingHolder = null;
-            holder.textViewName.setSelected(false);
-        });
-
-        holder.anterior.setOnClickListener(v -> {
-            // Retroceder 30 segundos
-            int currentPosition = mediaPlayer.getCurrentPosition();
-            int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
-            mediaPlayer.seekTo(Math.max(rewindPosition, 0));
-        });
-
-        holder.siguiente.setOnClickListener(v -> {
-            // Adelantar 30 segundos
-            int currentPosition = mediaPlayer.getCurrentPosition();
-            int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
-            mediaPlayer.seekTo(Math.min(fastForwardPosition, mediaPlayer.getDuration()));
+            holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+            holder.textViewName.setSelected(true);
         });
     }
 
-    private void pauseAudio() {
-        mediaPlayer.pause();
-        if (currentPlayingHolder != null) {
-            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-        }
-    }
-
-    private void resumeAudio() {
-        mediaPlayer.start();
-        if (currentPlayingHolder != null) {
-            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
-        }
-    }
 
     public void releaseMediaPlayer() {
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
+        Intent stopIntent = new Intent(context, MusicService.class);
+        stopIntent.setAction(MusicService.ACTION_STOP);
+        context.startService(stopIntent);
+
+        if (currentPlayingHolder != null) {
+            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            currentPlayingHolder.textViewName.setSelected(false);
+            currentPlayingHolder = null;
+            currentPlayingPosition = -1;
         }
     }
 

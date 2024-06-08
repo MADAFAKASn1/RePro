@@ -1,5 +1,9 @@
 package com.example.repro.ui.inicio;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +22,7 @@ import com.example.repro.R;
 import com.example.repro.databinding.FragmentInicioBinding;
 import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoCanciones;
 import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoVideos;
+import com.example.repro.ui.servicios.MusicService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +43,17 @@ public class InicioFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private AdaptadorPersonalizadoCanciones adaptadorCanciones;
     private AdaptadorPersonalizadoVideos adaptadorVideos;
+
+    private BroadcastReceiver musicCompletionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MusicService.ACTION_COMPLETED.equals(intent.getAction())) {
+                if (adaptadorCanciones != null) {
+                    adaptadorCanciones.releaseMediaPlayer();
+                }
+            }
+        }
+    };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -67,7 +83,9 @@ public class InicioFragment extends Fragment {
                         loadCanciones();
                         break;
                     case 1: // Videos
-                        adaptadorCanciones.releaseMediaPlayer();
+                        if (adaptadorCanciones != null) {
+                            adaptadorCanciones.releaseMediaPlayer();
+                        }
                         loadVideos();
                         break;
                 }
@@ -76,6 +94,10 @@ public class InicioFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        // Registrar el receptor
+        IntentFilter filter = new IntentFilter(MusicService.ACTION_COMPLETED);
+        getContext().registerReceiver(musicCompletionReceiver, filter);
 
         return root;
     }
@@ -134,13 +156,13 @@ public class InicioFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (adaptadorCanciones != null) {
             adaptadorCanciones.releaseMediaPlayer();
         }
+        getContext().unregisterReceiver(musicCompletionReceiver);
         binding = null;
     }
 }
