@@ -3,8 +3,8 @@ package com.example.repro.ui.adaptadores;
 import static com.example.repro.ui.servicios.MusicService.mediaPlayer;
 
 import android.content.Context;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.repro.R;
 import com.example.repro.ui.modelo.Cancion;
+import com.example.repro.ui.servicios.MusicService;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyViewHolder> {
     private List<Cancion> mData;
     private Context context;
     private LayoutInflater inflater;
-    private MediaPlayer mediaPlayer;
     private int currentPlayingPosition = -1;
     private MyViewHolder currentPlayingHolder = null;
 
@@ -33,7 +32,7 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         super();
         this.mData = data;
         this.context = ctx;
-        this.inflater = LayoutInflater.from(context);
+        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @NonNull
@@ -52,30 +51,27 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         } else {
             holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
         }
-        holder.playPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentPlayingPosition == holder.getAdapterPosition()) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                        holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                    } else {
-                        mediaPlayer.start();
-                        holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
-                    }
+        holder.playPauseButton.setOnClickListener(v -> {
+            if (currentPlayingPosition == holder.getAdapterPosition()) {
+                Intent intent;
+                if (mediaPlayer.isPlaying()) {
+                    intent = new Intent(context, MusicService.class);
+                    intent.setAction(MusicService.ACTION_PAUSE);
+                    context.startService(intent);
+                    holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+                    holder.textViewName.setSelected(false);
                 } else {
-                    try {
-                        // Detener la reproducción de la canción actual si hay una
-                        if (currentPlayingHolder != null) {
-                            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                        }
-                        playAudio(holder, item);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    intent = new Intent(context, MusicService.class);
+                    intent.setAction(MusicService.ACTION_RESUME);
+                    context.startService(intent);
+                    holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+                    holder.textViewName.setSelected(true);
                 }
+            } else {
+                playAudio(holder, item);
             }
         });
+
         holder.resta30seg.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
@@ -93,46 +89,56 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         });
     }
 
-
     @Override
     public int getItemCount() {
         return mData.size();
     }
 
-    private void playAudio(MyViewHolder holder, Cancion cancion) throws IOException {
-        if (mediaPlayer == null) {
-            mediaPlayer = new MediaPlayer();
-        } else {
-            mediaPlayer.reset();
+    private void playAudio(MyViewHolder holder, Cancion item) {
+        if (currentPlayingHolder != null) {
+            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            currentPlayingHolder.textViewName.setSelected(false);
         }
 
-        mediaPlayer.setDataSource(context, Uri.parse(cancion.getUri()));
-        mediaPlayer.prepare();
-        mediaPlayer.start();
-        holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
         currentPlayingPosition = holder.getAdapterPosition();
         currentPlayingHolder = holder;
 
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mediaPlayer.reset();
-                holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                currentPlayingPosition = -1;
-                currentPlayingHolder = null;
-            }
-        });
+        // Obtener la URL de la canción
+        String songUrl = item.getUri();
+
+        // Crear el intent para iniciar el servicio MusicService
+        Intent serviceIntent = new Intent(context, MusicService.class);
+        serviceIntent.setAction(MusicService.ACTION_PLAY);
+        serviceIntent.putExtra("songUrl", songUrl);
+
+        // Iniciar el servicio dependiendo de la versión de Android
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent);
+        } else {
+            context.startService(serviceIntent);
+        }
+
+        // Actualizar la interfaz de usuario
+        holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+        holder.textViewName.setSelected(true);
     }
 
     public void releaseMediaPlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+        Intent stopIntent = new Intent(context, MusicService.class);
+        stopIntent.setAction(MusicService.ACTION_STOP);
+        context.startService(stopIntent);
+
+        if (currentPlayingHolder != null) {
+            currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            currentPlayingHolder.textViewName.setSelected(false);
+            currentPlayingHolder = null;
+            currentPlayingPosition = -1;
         }
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textViewName;
+        ImageView imageView;
         ImageButton playPauseButton;
         ImageButton resta30seg;
         ImageButton suma30Seg;
@@ -140,6 +146,7 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textViewName);
+            imageView = itemView.findViewById(R.id.imageViewFondo);
             playPauseButton = itemView.findViewById(R.id.play_pause);
             resta30seg = itemView.findViewById(R.id.rest30seg);
             suma30Seg = itemView.findViewById(R.id.sum30seg);

@@ -20,11 +20,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import com.example.repro.databinding.FragmentCancionesBinding;
-import com.example.repro.ui.adaptadores.AdaptadorPersonalizadoCanciones;
 import com.example.repro.ui.adaptadores.CancionesAdapter;
 import com.example.repro.ui.modelo.Cancion;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class CancionesFragment extends Fragment {
     private static final int PERMISSION_REQUEST_CODE = 100;
     private RecyclerView recyclerView;
     private List<Cancion> cancionList;
-    private CancionesAdapter adaptadorCanciones; // Agrega el adaptador
+    private CancionesAdapter adaptadorCanciones;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -58,9 +57,7 @@ public class CancionesFragment extends Fragment {
 
     private void checkAndRequestPermissions() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // Si el permiso fue denegado previamente y el usuario marcó "No volver a preguntar"
             if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_MEDIA_AUDIO)) {
-                // Mostrar una explicación al usuario
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQUEST_CODE);
                 Toast.makeText(getContext(), "El permiso es necesario para cargar las canciones.", Toast.LENGTH_LONG).show();
             }
@@ -102,6 +99,7 @@ public class CancionesFragment extends Fragment {
             adaptadorCanciones.notifyDataSetChanged();
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
