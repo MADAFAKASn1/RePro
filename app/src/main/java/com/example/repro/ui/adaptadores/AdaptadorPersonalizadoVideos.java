@@ -20,6 +20,9 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
     private List<StorageReference> mData;
     private Context context;
     private LayoutInflater inflater;
+    private VideoView currentVideoView;
+    private ImageButton currentPlayPauseButton;
+    private TextView currentTextViewName;
 
     public AdaptadorPersonalizadoVideos(List<StorageReference> data, Context ctx) {
         this.mData = data;
@@ -42,16 +45,23 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
         item.getDownloadUrl().addOnSuccessListener(uri -> {
             holder.videoView.setVideoURI(uri);
             holder.videoView.setOnPreparedListener(mp -> {
-                mp.setLooping(true);
                 holder.playPauseButton.setOnClickListener(v -> {
                     if (holder.videoView.isPlaying()) {
                         holder.videoView.pause();
                         holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
                         holder.textViewName.setSelected(false);
                     } else {
+                        if (currentVideoView != null && currentVideoView.isPlaying()) {
+                            currentVideoView.pause();
+                            currentPlayPauseButton.setImageResource(R.drawable.icons8_play_30);
+                            currentTextViewName.setSelected(false);
+                        }
                         holder.videoView.start();
                         holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
                         holder.textViewName.setSelected(true);
+                        currentVideoView = holder.videoView;
+                        currentPlayPauseButton = holder.playPauseButton;
+                        currentTextViewName = holder.textViewName;
                     }
                 });
 
@@ -67,6 +77,10 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
                     int currentPosition = holder.videoView.getCurrentPosition();
                     int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
                     holder.videoView.seekTo(Math.min(fastForwardPosition, holder.videoView.getDuration()));
+                });
+
+                holder.videoView.setOnCompletionListener(mpe -> {
+                    holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
                 });
             });
         });

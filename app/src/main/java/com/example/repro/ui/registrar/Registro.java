@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 
 public class Registro extends AppCompatActivity {
@@ -38,33 +39,64 @@ public class Registro extends AppCompatActivity {
         binding.registrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!binding.email.getText().toString().isEmpty() && binding.password.getText().toString().equalsIgnoreCase(binding.passwordRepet.getText().toString())) {
-                    String pass = binding.password.getText().toString().trim();
-                    String ema = binding.email.getText().toString().trim();
-                    firebaseAuth.createUserWithEmailAndPassword(ema, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                String email = binding.email.getText().toString().trim();
+                String password = binding.password.getText().toString().trim();
+                String confirmPassword = binding.passwordRepet.getText().toString().trim();
+
+                // Verificar que no se deje ningún campo vacío
+                if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    Toast.makeText(Registro.this, "Por favor, complete todos los campos.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Verificar que las contraseñas coincidan
+                if (!password.equals(confirmPassword)) {
+                    Toast.makeText(Registro.this, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Verificar la complejidad de la contraseña
+                if (!isValidPassword(password)) {
+                    Toast.makeText(Registro.this, "La contraseña debe tener al menos 8 caracteres + números.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Crear el usuario en Firebase Authentication
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // El usuario se ha creado exitosamente en Firebase Authentication
-                                firebaseImple.registrarNuevoUsuario(ema);
+                                firebaseImple.registrarNuevoUsuario(email);
                                 Toast.makeText(Registro.this, "Registro realizado", Toast.LENGTH_SHORT).show();
                                 Intent i = new Intent(Registro.this, IniciarSesion.class);
                                 startActivity(i);
                                 finish();
                             } else {
-                                // Error al crear el usuario
-                                Toast.makeText(Registro.this, "Usuario ya registrado", Toast.LENGTH_SHORT).show();
+                                if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                    Toast.makeText(Registro.this, "El email ya está en uso.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(Registro.this, "Error al registrar el usuario.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Registro.this, "Error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Registro.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-                }
             }
         });
+
+    }
+
+    // Método para verificar la complejidad de la contraseña
+    private boolean isValidPassword(String password) {
+        // La contraseña debe tener al menos 8 caracteres y contener letras y números
+        return password.length() >= 8 && password.matches(".*[a-zA-Z].*") && password.matches(".*\\d.*");
     }
 
     @Override

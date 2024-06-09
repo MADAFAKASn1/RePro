@@ -129,7 +129,6 @@ public class MusicService extends Service {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                // Manejar el caso en el que no se ha concedido el permiso
                 return;
             }
         }
