@@ -29,34 +29,13 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
     private LayoutInflater inflater;
     private int currentPlayingPosition = -1;
     private MyViewHolder currentPlayingHolder = null;
-    private BroadcastReceiver completionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (MusicService.ACTION_COMPLETED.equals(intent.getAction())) {
-                if (currentPlayingHolder != null) {
-                    currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
-                    currentPlayingHolder.textViewName.setSelected(false);
-                    currentPlayingPosition = -1;
-                    currentPlayingHolder = null;
-                }
-            }
-        }
-    };
 
     public CancionesAdapter(List<Cancion> data, Context ctx) {
         super();
         this.mData = data;
         this.context = ctx;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        context.registerReceiver(completionReceiver, new IntentFilter(MusicService.ACTION_COMPLETED));
     }
-
-    @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        context.unregisterReceiver(completionReceiver);
-    }
-
 
     @NonNull
     @Override

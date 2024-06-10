@@ -1,8 +1,12 @@
 package com.example.repro.ui.canciones;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.repro.databinding.FragmentCancionesBinding;
 import com.example.repro.ui.adaptadores.CancionesAdapter;
 import com.example.repro.ui.modelo.Cancion;
+import com.example.repro.ui.servicios.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,16 @@ public class CancionesFragment extends Fragment {
     private RecyclerView recyclerView;
     private List<Cancion> cancionList;
     private CancionesAdapter adaptadorCanciones;
+    private BroadcastReceiver musicCompletionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MusicService.ACTION_COMPLETED.equals(intent.getAction())) {
+                if (adaptadorCanciones != null) {
+                    adaptadorCanciones.releaseMediaPlayer();
+                }
+            }
+        }
+    };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +66,10 @@ public class CancionesFragment extends Fragment {
 
         // Verificar y solicitar permisos si es necesario
         checkAndRequestPermissions();
+
+        // Registrar el receptor
+        IntentFilter filter = new IntentFilter(MusicService.ACTION_COMPLETED);
+        getContext().registerReceiver(musicCompletionReceiver, filter);
 
         return root;
     }
@@ -121,6 +140,7 @@ public class CancionesFragment extends Fragment {
         if (adaptadorCanciones != null) {
             adaptadorCanciones.releaseMediaPlayer();
         }
+        getContext().unregisterReceiver(musicCompletionReceiver);
         binding = null;
     }
 }
