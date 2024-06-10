@@ -156,7 +156,6 @@ public class InicioFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

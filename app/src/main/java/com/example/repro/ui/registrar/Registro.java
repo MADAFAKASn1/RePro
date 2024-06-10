@@ -90,7 +90,6 @@ public class Registro extends AppCompatActivity {
                     });
             }
         });
-
     }
 
     // Método para verificar la complejidad de la contraseña
