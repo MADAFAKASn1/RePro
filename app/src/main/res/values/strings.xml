@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Re-Pro</string>
+    <string name="title_home">Inicio</string>
+    <string name="title_dashboard">Canciones</string>
+    <string name="title_notifications">Videos</string>
+    <string name="bienvenidos_idiomaster">Bienvenidos a Re-Pro</string>
+    <string name="registrate_para_escuchar_musica_videos">Registrate para escuchar musica y ver videos</string>
+    <string name="email">Email</string>
+    <string name="contrasenia">Contraseña</string>
+    <string name="repite_la_contrasenia">Repite la contraseña</string>
+    <string name="registrar">Registrar</string>
+    <string name="no_tienes_cuenta_crea_una_aqui">¿No tienes cuenta? Crea una aquí</string>
+    <string name="o_inicia_sesion_con_google">o inicia sesion con Google</string>
+    <string name="iniciar_sesi">Iniciar sesión</string>
+    <string name="elegir_cancion_video">Canciones</string>
+    <string name="nombre_cancion">Nombre Cancion</string>
+    <string name="play_pause">Play/Pause</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="anterior">Anterior</string>
+    <string name="nombre_video">Nombre Video</string>
+    <string name="imagen_de_la_canci_n">Imagen de la canción</string>
+    <string name="default_notification_channel_id">Music Service Channel</string>
+    <string-array name="spinner_options">
+        <item>Canciones</item>
+        <item>Videos</item>
+    </string-array>
+</resources>
