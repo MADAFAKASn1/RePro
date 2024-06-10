@@ -39,7 +39,6 @@ public class MusicService extends Service {
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setOnCompletionListener(mp -> {
-                stopSelf();
                 sendBroadcast(new Intent(ACTION_COMPLETED));
             });
         }

@@ -23,6 +23,7 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
     private VideoView currentVideoView;
     private ImageButton currentPlayPauseButton;
     private TextView currentTextViewName;
+    private int currentPlayingPosition = -1;
 
     public AdaptadorPersonalizadoVideos(List<StorageReference> data, Context ctx) {
         this.mData = data;
@@ -42,6 +43,15 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
         StorageReference item = mData.get(position);
         holder.textViewName.setText(item.getName());
 
+
+        if (position == currentPlayingPosition) {
+            holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+            holder.textViewName.setSelected(true);
+        } else {
+            holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            holder.textViewName.setSelected(false);
+        }
+
         item.getDownloadUrl().addOnSuccessListener(uri -> {
             holder.videoView.setVideoURI(uri);
             holder.videoView.setOnPreparedListener(mp -> {
@@ -59,6 +69,7 @@ public class AdaptadorPersonalizadoVideos extends RecyclerView.Adapter<Adaptador
                         holder.videoView.start();
                         holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
                         holder.textViewName.setSelected(true);
+                        currentPlayingPosition = holder.getAdapterPosition();
                         currentVideoView = holder.videoView;
                         currentPlayPauseButton = holder.playPauseButton;
                         currentTextViewName = holder.textViewName;

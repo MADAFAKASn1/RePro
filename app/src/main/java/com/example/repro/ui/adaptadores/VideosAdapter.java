@@ -45,8 +45,10 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.MyViewHold
 
         if (position == currentPlayingPosition) {
             holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+            holder.textViewName.setSelected(true);
         } else {
             holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            holder.textViewName.setSelected(false);
         }
 
         holder.videoView.setVideoURI(Uri.parse(item.getUri()));

@@ -2,8 +2,10 @@ package com.example.repro.ui.adaptadores;
 
 import static com.example.repro.ui.servicios.MusicService.mediaPlayer;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,13 +29,34 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
     private LayoutInflater inflater;
     private int currentPlayingPosition = -1;
     private MyViewHolder currentPlayingHolder = null;
+    private BroadcastReceiver completionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MusicService.ACTION_COMPLETED.equals(intent.getAction())) {
+                if (currentPlayingHolder != null) {
+                    currentPlayingHolder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+                    currentPlayingHolder.textViewName.setSelected(false);
+                    currentPlayingPosition = -1;
+                    currentPlayingHolder = null;
+                }
+            }
+        }
+    };
 
     public CancionesAdapter(List<Cancion> data, Context ctx) {
         super();
         this.mData = data;
         this.context = ctx;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        context.registerReceiver(completionReceiver, new IntentFilter(MusicService.ACTION_COMPLETED));
     }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        context.unregisterReceiver(completionReceiver);
+    }
+
 
     @NonNull
     @Override
@@ -48,8 +71,10 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         holder.textViewName.setText(item.getTitle());
         if (position == currentPlayingPosition) {
             holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+            holder.textViewName.setSelected(true);
         } else {
             holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            holder.textViewName.setSelected(false);
         }
         holder.playPauseButton.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition()) {
@@ -73,6 +98,7 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         });
 
         holder.resta30seg.setOnClickListener(v -> {
+            // Retroceder 30 segundos
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
                 int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
@@ -81,6 +107,7 @@ public class CancionesAdapter extends RecyclerView.Adapter<CancionesAdapter.MyVi
         });
 
         holder.suma30Seg.setOnClickListener(v -> {
+            // Adelantar 30 segundos
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
                 int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos

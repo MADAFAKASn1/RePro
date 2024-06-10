@@ -48,8 +48,10 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         holder.textViewName.setText(item.getName());
         if (position == currentPlayingPosition) {
             holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
+            holder.textViewName.setSelected(true);
         } else {
             holder.playPauseButton.setImageResource(R.drawable.icons8_play_30);
+            holder.textViewName.setSelected(false);
         }
         holder.playPauseButton.setOnClickListener(v -> {
             if (currentPlayingPosition == holder.getAdapterPosition()) {
@@ -73,6 +75,7 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         });
 
         holder.resta30seg.setOnClickListener(v -> {
+            // Retroceder 30 segundos
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
                 int rewindPosition = currentPosition - 30000; // 30 segundos en milisegundos
@@ -81,6 +84,7 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         });
 
         holder.suma30Seg.setOnClickListener(v -> {
+            // Adelantar 30 segundos
             if (currentPlayingPosition == holder.getAdapterPosition() && mediaPlayer != null) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
                 int fastForwardPosition = currentPosition + 30000; // 30 segundos en milisegundos
@@ -104,15 +108,19 @@ public class AdaptadorPersonalizadoCanciones extends RecyclerView.Adapter<Adapta
         currentPlayingHolder = holder;
 
         item.getDownloadUrl().addOnSuccessListener(uri -> {
+            // Crear el intent para iniciar el servicio MusicService
             Intent serviceIntent = new Intent(context, MusicService.class);
             serviceIntent.setAction(MusicService.ACTION_PLAY);
             serviceIntent.putExtra("songUrl", uri.toString());
+
+            // Iniciar el servicio dependiendo de la versión de Android
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(serviceIntent);
             } else {
                 context.startService(serviceIntent);
             }
 
+            // Actualizar la interfaz de usuario
             holder.playPauseButton.setImageResource(R.drawable.icons8_pausa_30);
             holder.textViewName.setSelected(true);
         });
